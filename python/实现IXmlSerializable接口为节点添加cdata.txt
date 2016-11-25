@@ -1,0 +1,41 @@
+2.2,实现IXmlSerializable接口
+/// <summary>
+/// Test class
+/// </summary>
+[Serializable]
+public class TestClass : IXmlSerializable
+{
+[XmlElement("ID")]
+public int ID { get; set; }
+
+[XmlElement("Content")]
+public string CDataContent { get; set; }
+
+
+System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
+{
+return null;
+}
+
+void IXmlSerializable.ReadXml(XmlReader reader)
+{
+reader.ReadStartElement("TestClass");
+this.ID=reader.ReadElementContentAsInt("ID", "");
+this.CDataContent=reader.ReadElementContentAsString("Content", "");
+reader.ReadEndElement();
+}
+
+void IXmlSerializable.WriteXml(XmlWriter writer)
+{
+writer.WriteStartElement("ID");
+writer.WriteValue(this.ID);
+writer.WriteEndElement();
+writer.WriteStartElement("Content");
+writer.WriteCData(this.CDataContent);
+writer.WriteEndElement();
+
+}
+}
+请留意ReadXml与WriteXml两个方法。一个将Xml的值读取出来赋值给当前实例，一个将当前实例的属性值写入到XML；而另外一个GetSchema在返回此对象对应的XML架构用于验证是否为合法的XML文档。
+经过测试，上述方法可以达到第一种方法的效果，而且更加的安全，只不过在实现接口的时候需要麻烦一点。
+对于一些无法直接序列化的类比如泛型的List等，也可以按照这种方式实现自定义的序列化与反序列化
